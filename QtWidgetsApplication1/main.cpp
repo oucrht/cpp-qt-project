@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QtWidgetsApplication1 w;
     w.show();
-    w.paintEvent();
+ 
     return a.exec();
 }
 

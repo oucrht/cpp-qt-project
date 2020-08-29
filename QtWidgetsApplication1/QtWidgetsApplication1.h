@@ -9,8 +9,12 @@ class QtWidgetsApplication1 : public QMainWindow
 
 public:
     QtWidgetsApplication1(QWidget *parent = Q_NULLPTR);
-    void paintEvent(QPaintEvent* event);
-
+    ~QtWidgetsApplication1();
+    void paintEvent(QPaintEvent*);
+        
+protected:
+    void timerEvent(QTimerEvent* event);
+    int m_nTimerId;
 private:
     Ui::QtWidgetsApplication1Class ui;
 };
