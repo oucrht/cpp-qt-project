@@ -27,6 +27,20 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="3">
+      <widget class="QPushButton" name="pushButton4">
+       <property name="text">
+        <string>缩小尺寸</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="pushButton2">
+       <property name="text">
+        <string>左右翻转</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="pushButton">
        <property name="text">
@@ -44,14 +58,14 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
-      <widget class="QPushButton" name="pushButton2">
+     <item row="1" column="4">
+      <widget class="QPushButton" name="pushButton5">
        <property name="text">
-        <string>左右翻转</string>
+        <string>保存</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0" colspan="3">
+     <item row="2" column="0" colspan="5">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>TextLabel</string>
@@ -91,8 +105,8 @@
    <slot>FlipImageUpDown()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>429</x>
-     <y>46</y>
+     <x>321</x>
+     <y>47</y>
     </hint>
     <hint type="destinationlabel">
      <x>445</x>
@@ -107,8 +121,8 @@
    <slot>FlipImageRightLeft()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>651</x>
-     <y>34</y>
+     <x>471</x>
+     <y>35</y>
     </hint>
     <hint type="destinationlabel">
      <x>689</x>

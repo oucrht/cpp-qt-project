@@ -22,13 +22,16 @@ public:
     void From2Dto1D(unsigned char* dst, unsigned char** src, int rows, int cols);
     void FlipImageUpDown(unsigned char** a, int rows, int cols);
     void FlipImageLeftRight(unsigned char** a, int rows, int cols);
-  //  void QtApp2::paintEvent(QPaintEvent* e);
+    void smallerSize(unsigned char **dst);
+    bool saveImg();
     void showImg();
 
 private slots:
     void on_pushButton_clicked();
     void on_pushButton2_clicked();
     void on_pushButton3_clicked();
+    void on_pushButton4_clicked();
+    void on_pushButton5_clicked();
 
 private:
     Ui::QtApp2Class ui;
