@@ -25,7 +25,8 @@ public:
     void smallerSize(unsigned char **dst);
     bool saveImg();
     void showImg();
-
+    //void reverse(unsigned char* dst ,unsigned char* p);
+    //void swap(void* t1, void* t2, int size);
 private slots:
     void on_pushButton_clicked();
     void on_pushButton2_clicked();
@@ -39,7 +40,7 @@ private:
     FILE* fp;
     int bmpWidth;
     int bmpHeight;
-    //int lineByte;
+    int lineByte;
     int biBitCount;//图像类型，每像素位数
     unsigned char* p1d;//读入图像数据的指针
 };

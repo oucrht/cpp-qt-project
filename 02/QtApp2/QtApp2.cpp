@@ -1,7 +1,10 @@
 #include "QtApp2.h"
 #include <qpainter.h>
 #include <fstream>
-
+//解决中文乱码问题
+#ifdef WIN32  
+#pragma execution_character_set("utf-8")  
+#endif
 
 //#include <wingdi.h>
 
@@ -37,7 +40,12 @@ DWORD    biClrUsed;         //位图实际使用的颜色表中的颜色数
 DWORD    biClrImportant;    //位图显示过程中重要的颜色数 
 } BITMAPINFOHEADER;
 
-
+struct RGB
+{
+    char R;
+    char G;
+    char B;
+};
 
 QtApp2::QtApp2(QWidget *parent)
     : QMainWindow(parent)
@@ -57,10 +65,10 @@ void QtApp2::From1Dto2D(unsigned char** dst, unsigned char* src, int rows, int c
     int i = 0;
     int j = 0;
     int k = 0;
-    int lineByte = (cols * 24 + 31) / 32 * 4;
+    int lineSize = (cols * 24 + 31) / 32 * 4;
     for (i=0; i < rows; i++)
     {
-        for (j=0; j < lineByte; j++)
+        for (j=0; j < lineSize; j++)
         {
             dst[i][j] = src[k];
             k++;
@@ -73,10 +81,10 @@ void QtApp2::From2Dto1D(unsigned char* dst, unsigned char** src, int rows, int c
     int i = 0;
     int j = 0;
     int k = 0;
-    int lineByte = (cols * 24 + 31) / 32 * 4;
+    int lineSize = (cols * 24 + 31) / 32 * 4;
     for (i = 0; i < rows; i++)
     {
-        for (j = 0; j < lineByte; j++)
+        for (j = 0; j < lineSize; j++)
         {
             dst[k] = src[i][j];
             k++;
@@ -88,9 +96,9 @@ void QtApp2::From2Dto1D(unsigned char* dst, unsigned char** src, int rows, int c
 void QtApp2::FlipImageUpDown(unsigned char** a, int rows, int cols)
 {
     int i, j;
-    int lineByte = (cols * 24 + 31) / 32 * 4;
+    int lineSize = (cols * 24 + 31) / 32 * 4;
     for (i = 0; i < rows / 2; i++)
-        for (j = 0; j < lineByte; j++) {
+        for (j = 0; j < lineSize; j++) {
             int t = a[i][j]; 
             a[i][j] = a[rows - i - 1][j]; 
             a[rows - i - 1][j] = t;
@@ -99,18 +107,32 @@ void QtApp2::FlipImageUpDown(unsigned char** a, int rows, int cols)
 
 void QtApp2::FlipImageLeftRight(unsigned char** a, int rows, int cols)
 {
-    int i, j;
-    int lineByte = (cols * 24 + 31) / 32 * 4;
-    for (i = 0; i < lineByte / 2; i++)
-        for (j = 0; j < rows; j++) {
-            int t = a[j][i];
-            a[j][i] = a[j][lineByte - i - 1];
-            a[j][lineByte - i - 1] = t;
+    
+    int i, j,k=0,m;
+    for (i = 0; i < rows; i++)
+    {
+        for (j = 0; j < cols/2; j++)
+        {
+            k= 3 * j;
+            m = 0;
+            while (m < 3)
+            {
+                int t = a[i][k];
+                a[i][k] = a[i][lineByte + m - (j + 1) * 3];
+                a[i][lineByte + m - (j + 1) * 3] = t;
+                m++;
+                k++;
+            }
+            
         }
+       
+    }
+        
 }
 
 void QtApp2::smallerSize(unsigned char** dst)
 {
+    
     unsigned char** src = new unsigned char* [bmpHeight];
     int lineByte = (bmpWidth * 24 + 31) / 32 * 4;
     for (int i = 0; i < bmpHeight; i++)
@@ -118,24 +140,24 @@ void QtApp2::smallerSize(unsigned char** dst)
         src[i] = new unsigned char[lineByte];
     }
     From1Dto2D(src, p1d, bmpHeight, bmpWidth);
-    int i, j;
+    int i, j,k;
     int m = 0;
     int n = 0;
-    for (i = 0; i < bmpHeight; i++)
+    for (i = 0; i < bmpHeight; i+=2)
     {
-        if (i % 2 == 0)//是奇数行
-        {
-            for (j = 0; j < lineByte; j++)
+        k = 0;
+            for (j = 0; j < lineByte-3; j+=6)
             {
-                if (j % 2 == 0)//是奇数列
-                {
-                    dst[m][n] = src[i][j];
-                    n++;
-                }
+                    n = 0;
+                    while (n < 3)
+                    {
+                        dst[m][k] = src[i][j+n];
+                        n++;
+                        k++;
+                    } 
             }
             m++;
-            n = 0;
-        }
+            
     }
     for (int i = 0; i < bmpHeight; i++)
         delete[]src[i];
@@ -144,10 +166,11 @@ void QtApp2::smallerSize(unsigned char** dst)
 
 bool QtApp2::saveImg()
 {
+   // char fileInfoArr[14] = { 0 };
     BITMAPINFOHEADER bmiHdr; //定义信息头        
     bmiHdr.biSize = 40;
     bmiHdr.biWidth = bmpWidth;
-    bmiHdr.biHeight = bmpHeight;
+    bmiHdr.biHeight = -1*bmpHeight;
     bmiHdr.biPlanes = 1;
     bmiHdr.biBitCount = 24;
     bmiHdr.biCompression = 0;
@@ -157,18 +180,32 @@ bool QtApp2::saveImg()
     bmiHdr.biClrUsed = 0;
     bmiHdr.biClrImportant = 0;
 
-    char* fileNameTemp;
-    QByteArray ba = fileName.replace("/", "\\\\").toLatin1();
-    fileNameTemp = ba.data();
-    FILE* fp = fopen(fileNameTemp, "wb");
+    //重新定义BITMAPFILEHEADER 结构体，解决4k对齐问题
+    typedef struct tagBITMAPFILEHEADER {
+        //WORD     bfType;  //位图文件的类型，必须为0x424d 即BM两个字符的ASCII码
+        DWORD    bfSize;  //位图文件的大小，以字节为单位 包括该14字节    
+        WORD     bfReserved1; //位图文件保留字，暂时不用，一般为0         
+        WORD     bfReserved2; //位图文件保留字，暂时不用，一般为0         
+        DWORD    bfOffBits; //位图数据距文件头的偏移量，以字节为单位，即前三部分和
+    } myBITMAPFILEHEADER;
+
+    QString saveFilePath = QFileDialog::getSaveFileName(this,tr("保存图片"), "",
+        tr("*.bmp")); //选择路径
+    char* ch;
+    QByteArray ba = saveFilePath.toLatin1(); // must
+    ch = ba.data();
+    FILE* fp = fopen(ch, "wb");
     if (fp)
     {
-        BITMAPFILEHEADER fheader = { 0 };
-        fheader.bfType = 'M' << 8 | 'B';
+        myBITMAPFILEHEADER fheader = { 0 };
+        unsigned short bfType = 0x4d42;//'M' << 8 | 'B';
         fheader.bfSize = 40 + 14 + bmiHdr.biSizeImage;
+        fheader.bfReserved1 = 0;
+        fheader.bfReserved2 = 0;
         fheader.bfOffBits = 40 + 14;
-        fwrite(&fheader, 1, 14, fp);
-        fwrite(&bmiHdr, 1, 40, fp);
+        fwrite(&bfType, 1, 2, fp);
+        fwrite(&fheader, 1, sizeof(fheader), fp);
+        fwrite(&bmiHdr, 1, sizeof(bmiHdr), fp);
         fwrite(p1d, 1, bmiHdr.biSizeImage, fp);
         fclose(fp);
         return true;
@@ -180,7 +217,8 @@ bool QtApp2::saveImg()
 //显示图片
 void QtApp2::showImg()
 {
-    
+   // unsigned char* p_temp = new unsigned char[lineByte * bmpHeight];
+   // reverse(p_temp, p1d);
     QImage* tempImage = new QImage(p1d, bmpWidth, bmpHeight, 3 * bmpWidth, QImage::Format_RGB888);
     
     ui.label->setPixmap(QPixmap::fromImage(*tempImage));
@@ -235,10 +273,20 @@ void QtApp2::on_pushButton_clicked()
             bmpHeight = head.biHeight;
             biBitCount = head.biBitCount;
             //定义变量，计算图像每行像素所占的字节数（必须是4的倍数）
-            int lineByte = (bmpWidth * biBitCount +31) / 32 * 4;
+            lineByte = (bmpWidth * biBitCount +31) / 32 * 4;
+
             //申请位图数据所需要的空间，读位图数据进内存
             p1d = new unsigned char[lineByte * bmpHeight];
             fread(p1d, 1, lineByte * bmpHeight, fp);
+           
+            //BGR 转 RGB    
+            for (int i = 0; i < lineByte * bmpHeight-2; i+=3)
+            {
+                int temp = p1d[i];
+                p1d[i] = p1d[i + 2];
+                p1d[i + 2] = temp;
+               
+            }
 
             showImg();
         }
@@ -269,20 +317,42 @@ void QtApp2::on_pushButton3_clicked()
 //缩小图片按钮
 void QtApp2::on_pushButton4_clicked()
 {
-    unsigned char** p2d = new unsigned char* [bmpHeight];
-    int lineByte = (bmpWidth * 24 + 31) / 32 * 4;
-    for (int i = 0; i < bmpHeight; i++)
+    int cols, rows, size;
+    if (bmpWidth % 2 == 0)
     {
-        p2d[i] = new unsigned char[lineByte];
+        cols = bmpWidth / 2;
+    }
+    else
+    {
+        cols = bmpWidth / 2 + 1;
+    }
+    if (bmpHeight % 2 == 0)
+    {
+        rows = bmpHeight / 2;
+    }
+    else
+    {
+        rows = bmpHeight / 2 + 1;
+    }
+
+    int lineByteTemp = (cols * 24 + 31) / 32 * 4;
+    unsigned char** p2d = new unsigned char* [rows];
+    for (int i = 0; i < rows; i++)
+    {
+        p2d[i] = new unsigned char[lineByteTemp];
     }
     smallerSize(p2d);
-    From2Dto1D(p1d, p2d, bmpHeight, bmpWidth);
-    QImage* tempImage = new QImage(p1d, bmpWidth, bmpHeight, 3 * bmpWidth, QImage::Format_RGB888);
+    size = rows * lineByteTemp;
+    //unsigned char* p_temp = new unsigned char[size];
+    //p1d = new unsigned char[size];
+    From2Dto1D(p1d, p2d, rows, cols);
+    QImage* tempImage = new QImage(p1d, cols, rows,lineByteTemp, QImage::Format_RGB888);
 
     ui.label->setPixmap(QPixmap::fromImage(*tempImage));
-    for (int i = 0; i < bmpHeight; i++)
+    for (int i = 0; i < rows; i++)
         delete[]p2d[i];
     delete[]p2d;
+    //delete[]p_temp;
 }
 
 //保存按钮
