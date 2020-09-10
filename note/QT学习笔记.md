@@ -137,7 +137,7 @@ QTimer *timer = new QTimer(this);
 
 ## 六、事件分发
 
-![](D:\data\github\cpp-qt-project\note\QT学习笔记.assets\未命名绘图.svg)
+![](\QT学习笔记.assets\未命名绘图.svg)
 
 #### 通过Event事件，拦截鼠标点击事件
 
@@ -177,7 +177,7 @@ void Widget::paintEvent(QPaintEvent *)
 
 #### 绘图时使用的坐标示意
 
-![](D:\data\github\cpp-qt-project\note\QT学习笔记.assets\未命名绘图2.svg)
+![](\QT学习笔记.assets\未命名绘图2.svg)
 
 #### 设置抗锯齿：
 
@@ -193,9 +193,9 @@ painter.setRenderHint(QPainter::Antialiasing);//其他参数可查手册
 painter.translate(100,0;)//注意移动的是画家的位置
 ```
 
-![](D:\data\github\cpp-qt-project\note\QT学习笔记.assets\2020-09-10_194335.png)
+![](\QT学习笔记.assets\2020-09-10_194335.png)
 
-<img src="D:\data\github\cpp-qt-project\note\QT学习笔记.assets\2020-09-10_194116.png" style="zoom:70%;" />
+<img src="\QT学习笔记.assets\2020-09-10_194116.png" style="zoom:70%;" />
 
 #### 用painter画图片：
 
@@ -209,9 +209,9 @@ painter.drawPixmap(x坐标,y坐标,QPixmap("图片路径"));//具体参数查手
 
 通过按钮来控制画家位置。其中x是当前类的一个成员变量，每当按钮被点击时，x增加40,并更新绘图事件。具体效果见动图.
 
-<img src="D:\data\github\cpp-qt-project\note\QT学习笔记.assets\2020-09-10_200139.png" style="zoom:60%;" />
+<img src="\QT学习笔记.assets\2020-09-10_200139.png" style="zoom:60%;" />
 
-<img src="D:\data\github\cpp-qt-project\note\QT学习笔记.assets\1.gif" style="zoom:67%;" />
+<img src="\QT学习笔记.assets\1.gif" style="zoom:67%;" />
 
 ## 八、绘图设备
 
@@ -274,4 +274,4 @@ void MainWindow::paintEvent(QPaintEvent *)
 }
 ```
 
-<img src="D:\data\github\cpp-qt-project\note\QT学习笔记.assets\2020-09-10_204023.png" style="zoom:50%;" />
+<img src="\QT学习笔记.assets\2020-09-10_204023.png" style="zoom:50%;" />
