@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1138</width>
+    <height>666</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="myLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>31</x>
+      <y>24</y>
+      <width>1071</width>
+      <height>571</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1138</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <addaction name="actionOpenFile"/>
+    <addaction name="actionSaveFile"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>操作</string>
+    </property>
+    <widget class="QMenu" name="menu_4">
+     <property name="title">
+      <string>旋转</string>
+     </property>
+     <addaction name="action90"/>
+     <addaction name="action180"/>
+    </widget>
+    <addaction name="actionFlipUD"/>
+    <addaction name="actionFlipRL"/>
+    <addaction name="separator"/>
+    <addaction name="menu_4"/>
+    <addaction name="separator"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionSmall"/>
+    <addaction name="actionExpand"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>计算</string>
+    </property>
+    <addaction name="actionMean"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpenFile">
+   <property name="text">
+    <string>打开</string>
+   </property>
+  </action>
+  <action name="actionSaveFile">
+   <property name="text">
+    <string>保存</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>退出</string>
+   </property>
+  </action>
+  <action name="actionFlipUD">
+   <property name="text">
+    <string>上下翻转</string>
+   </property>
+  </action>
+  <action name="actionFlipRL">
+   <property name="text">
+    <string>左右翻转</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="text">
+    <string>裁剪</string>
+   </property>
+  </action>
+  <action name="actionSmall">
+   <property name="text">
+    <string>缩小</string>
+   </property>
+  </action>
+  <action name="actionMean">
+   <property name="text">
+    <string>均值和方差</string>
+   </property>
+  </action>
+  <action name="actionFang">
+   <property name="text">
+    <string>方差</string>
+   </property>
+  </action>
+  <action name="actionExpand">
+   <property name="text">
+    <string>放大</string>
+   </property>
+  </action>
+  <action name="action90">
+   <property name="text">
+    <string>90°</string>
+   </property>
+  </action>
+  <action name="action180">
+   <property name="text">
+    <string>180°</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>myLabel</class>
+   <extends>QLabel</extends>
+   <header>mylabel.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
