@@ -15,9 +15,6 @@ void myLabel::mousePressEvent(QMouseEvent *ev)
 }
 
 
-
-
-
 int myLabel::getX()
 {
     return x;

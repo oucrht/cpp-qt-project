@@ -47,6 +47,8 @@ Image::Image()
 //构造函数重载
 Image::Image(int h, int w)
 {
+    this->height=h;
+    this->width=w;
     data = new unsigned char* [h];
     for (int i = 0; i < h; i++)
     {
@@ -58,6 +60,8 @@ Image::Image(int h, int w)
 //构造函数重载，创建的图像像素值都为val
 Image::Image(int h, int w, unsigned char val)
 {
+    this->height=h;
+    this->width=w;
     data = new unsigned char* [h];
     for (int i = 0; i < h; i++)
     {
@@ -71,6 +75,7 @@ Image::Image(int h, int w, unsigned char val)
             data[i][j]=val;
         }
     }
+
 }
 
 //构造函数重载，利用文件名从硬盘加载图像文件成为 Image 对象
@@ -116,6 +121,7 @@ Image::Image(unsigned char* m, int rows, int cols)
             k++;
         }
     }
+
 }
 //构造函数重载，从动态数组（二级指针）创建 Image 对象，图像的行数和列数由后面两个参数给出
 Image:: Image(unsigned char** m, int h, int w)
@@ -146,7 +152,7 @@ Image:: Image(unsigned char** m, int h, int w)
 }
 
 //拷贝构造函数
-Image::Image(const Image& im)
+Image::Image(const Image& im):QObject(this),Matrix()
 {
     this->height=im.height;
     this->width=im.width;
@@ -162,12 +168,13 @@ Image::Image(const Image& im)
 //析构函数
 Image::~Image()
 {
+    qDebug()<<"正在调用Image的析构函数";
     for (int i = 0; i <height; i++)
         delete[]data[i];
     delete[]data;
 
-    delete[]img1d;
-    qDebug()<<"正在调用Image的析构函数";
+    //delete[]img1d;
+    qDebug()<<"Image析构函数调用结束";
 }
 //从硬盘读入图像文件;
 void Image::Read(char* ImageName)
@@ -211,24 +218,32 @@ void Image::Read(char* ImageName)
     fread(src, 1, lineByte * height, fp);
     qDebug()<<"文件读取完成，正在转灰度图...";
 
-    img1d = new unsigned char[((width * 8 + 31) / 32 * 4)*height];
-    //转灰度
-    int i = 0;
-    int j = 0;
-    int k = 0;
-    int temp=0;
-
-    for(i=0;i<lineByte*height;i+=3)
+    if(biBitCount == 24)
     {
-        temp =0;
-        for(j=0;j<3;j++)
-        {
-            temp+=src[i+j];
-        }
-        img1d[k]=(unsigned char)(temp/3);
-        k++;
+        img1d = new unsigned char[((width * 8 + 31) / 32 * 4)*height];
+        //转灰度
+        int i = 0;
+        int j = 0;
+        int k = 0;
+        int temp=0;
 
+        for(i=0;i<lineByte*height;i+=3)
+        {
+            temp =0;
+            for(j=0;j<3;j++)
+            {
+                temp+=src[i+j];
+            }
+            img1d[k]=(unsigned char)(temp/3);
+            k++;
+
+        }
     }
+    else if(biBitCount == 8)
+    {
+        img1d = src;
+    }
+
 
 }
 //获取图像中指定点的值
@@ -236,6 +251,11 @@ unsigned char& Image::At(int row, int col)
 {
 
     return data[row][col];
+}
+
+void Image::Set(int row, int col, unsigned char value)
+{
+    data[row][col]=value;
 }
 //设置图像为同一值
 void Image::Set(unsigned char value)
@@ -372,26 +392,29 @@ void Image::Cut(int x1, int y1, int x2, int y2)
     delete[]dst;
 }
 
+
 //图像旋转的函数
  void Image::Rotate(int degree)
  {
 
-     unsigned char ** dst = new unsigned char* [width];
-     for (int i = 0; i < width; i++)
-     {
-         dst[i] = new unsigned char[(height * 8 + 31) / 32 * 4];
-     }
-     int i,j;
-     for(i=0;i<width;i++)
-     {
-         for(j=0;j<height;j++)
+     if(degree == 90){
+         unsigned char ** dst = new unsigned char* [width];
+         for (int i = 0; i < width; i++)
          {
-             *(*(dst+i)+j) = *(*(data+j)+i);
+             dst[i] = new unsigned char[(height * 8 + 31) / 32 * 4];
          }
-     }
-     data = dst;
-     from2dto1d(data,img1d);
+         int i,j;
 
+         for(i=0;i<width;i++)
+         {
+             for(j=0;j<height;j++)
+             {
+                 *(*(dst+i)+j) = *(*(data+j)+i);
+             }
+         }
+         data = dst;
+         from2dto1d(data,img1d);
+     }
  }
 //求图像的均值和方差，利用参数输出
  void Image::Mean_Variance(float& m, float& var)
@@ -417,10 +440,7 @@ void Image::Cut(int x1, int y1, int x2, int y2)
      }
      var = sum/(height*((width * 8 + 31) / 32 * 4));
  }
-//实现友元函数，交换两个 Image 对象的数据
-void Swap(Image& a, Image& b)
-{
-}
+
 
 int Image::getHeight()
 {
@@ -437,6 +457,7 @@ unsigned char * Image::getImgPointer()
     return img1d;
 }
 
+
 void Image::from2dto1d(unsigned char** src, unsigned char * dst)
 {
     int i = 0;
@@ -451,6 +472,39 @@ void Image::from2dto1d(unsigned char** src, unsigned char * dst)
             k++;
         }
     }
-    img1d = dst;
+    memcpy(img1d,dst,height*lineSize);
+   // img1d = dst;
 
 }
+
+void Image::from2dto1d()
+{
+    from2dto1d(data,img1d);
+}
+
+
+Image &Image::operator=(const Matrix &mat)
+{
+    if (this != &mat)
+    {
+        this->height = mat.Height();
+        this->width = mat.Width();
+
+        int i,j;
+        for(i=0;i<height;i++)
+        {
+            for(j=0;j<width;j++)
+            {
+                Set(i,j,mat.At(i,j));
+            }
+        }
+        int linebyte = (width * 8 + 31) / 32 * 4;
+        img1d = new unsigned char[height*linebyte];
+        this->from2dto1d(this->data,this->img1d);
+
+    }
+    return *this;
+
+}
+
+

@@ -2,8 +2,9 @@
 #define IMAGE_H
 
 #include <QObject>
+#include "matrix.h"
 
-class Image : public QObject
+class Image : public QObject, public Matrix
 {
     Q_OBJECT
 public:
@@ -30,6 +31,14 @@ public:
     int getHeight();
     int getWidth();
     unsigned char * getImgPointer();
+    void from2dto1d(unsigned char** src, unsigned char * dst);
+    void from2dto1d();
+    //运算符重载
+
+    Image& operator=(const Matrix& mat);
+
+
+
 signals:
 private:
     unsigned char** data;
@@ -37,7 +46,7 @@ private:
     int height;
     int width;
 
-    void from2dto1d(unsigned char** src, unsigned char * dst);
+
 };
 
 #endif // IMAGE_H

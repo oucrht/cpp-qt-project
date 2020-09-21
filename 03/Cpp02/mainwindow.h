@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "meanfilter.h"
+#include "medianfilter.h"
 #include "image.h"
 #include "mylabel.h"
 
@@ -24,8 +26,11 @@ public:
     void openDialog();
     void getCutAera(int x1,int y1,int x2, int y2);
     void rotato();
-
     void showMean();
+
+    void meanFilter();
+    void medianFilter();
+
 private:
     Ui::MainWindow *ui;
     Image *myImg;

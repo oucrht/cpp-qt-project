@@ -20,12 +20,19 @@ SOURCES += \
     image.cpp \
     main.cpp \
     mainwindow.cpp \
+    matrix.cpp \
+    meanfilter.cpp \
+    medianfilter.cpp \
     mylabel.cpp
 
 HEADERS += \
+    Filter.h \
     dialog.h \
     image.h \
     mainwindow.h \
+    matrix.h \
+    meanfilter.h \
+    medianfilter.h \
     mylabel.h
 
 FORMS += \
